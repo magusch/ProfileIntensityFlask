@@ -66,6 +66,10 @@
 
         }
 
+        .str_field {
+            width: 300px;
+        }
+
     </style>
 
 </head>
@@ -82,7 +86,7 @@
 <p>
     <form action="" method="post" class="form" enctype="multipart/form-data">
         <div class="form-group col-6 col-sm-6 offset-3 offset-md-3">
-            <label for="floatingSelect">Выбрать люминофор</label>
+            <label for="floatingSelect">Выбрать хемилюминофор</label>
             <select class="form-control" id="floatingSelect" aria-label="Default select example">
               <option value="lmnl" selected>Люминол</option>
               <option value="lcgnn">Люцигенин</option>
@@ -92,9 +96,9 @@
      {% for form in forms %}
         {{ form.hidden_tag() }}
 
-         <div class="hid_obj_{{ loop.index }}" style="display: none;">
-            <label> Название образца: </label>
-                {{ form.samplename(class_='str_field %s'%(loop.index), id='name_%s'%(loop.index), value='Номер %s'%(loop.index)) }}
+         <div class="hid_obj_{{ loop.index }} container" style="display: none;">
+            <div class="col-sm"><label> Название образца {{ loop.index }}: </label>
+                {{ form.samplename(class_='str_field %s btn-lg'%(loop.index), id='name_%s'%(loop.index), value='Номер %s'%(loop.index)) }}</div>
             <label for="upl {{ loop.index }}" class="btn btn-warning btn-lg {{ loop.index }}" id="fake_button{{ loop.index }}">Загрузить Файл</label>{{ form.filename(class_='custom-file-upload', id='upl %s' %(loop.index))}}
             <div class="hid_but_{{ loop.index }}" style="display: none; margin-bottom: 10px;">
              <button type="button" class="btn btn-outline-secondary">Добавить образец</button>
