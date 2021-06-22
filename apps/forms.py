@@ -9,4 +9,4 @@ class UploadForm(FlaskForm):
 
 
 class DownloadFile(FlaskForm):
-    limit = FloatField('Значение предела', default='1.0')
+    limit = FloatField('Отношение канала 1 к каналу 2', default='1.0')

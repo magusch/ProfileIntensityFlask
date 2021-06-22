@@ -1,4 +1,4 @@
-import os,json
+import os,json, csv
 
 from flask import Flask, render_template, request,send_file, url_for, redirect, session, send_from_directory
 from flask_dropzone import Dropzone
@@ -92,9 +92,9 @@ def completed():
             file = data['filename']
             Y, I1_I0[samplename] = line_intensity(file)
             intensities[samplename] = list(Y)
-            filenames[samplename]=file.split('/')[-1]
+            filenames[samplename] = file.split('/')[-1]
             X = (list(range(len(Y))))
-
+            save_csv(X, intensities)
             #filename = 'static/uploads/' + file.split('/')[-1] #change
             #os.path.join(app.config['UPLOADED_PATH'], secure_filename(file))
         return render_template('output.html', X=X, Y=intensities, I1_I0=I1_I0, form=form, filenames=filenames)
@@ -120,30 +120,39 @@ def get_information(info_post):
 
     informations = []
     for label, intensity in Y.items():
-        if I1_I0[label]>limit:
-            I1_I0_answer = True
-        else:
-            I1_I0_answer = False
+        # if I1_I0[label]>limit:
+        #     I1_I0_answer = True
+        # else:
+        #     I1_I0_answer = False
         informations.append(
             {
-                'image': filenames[label], 'name': label, 'X': X, 'Y': intensity, 'I1_I0': I1_I0_answer
+                'image': filenames[label], 'name': label, 'X': X, 'Y': intensity, 'I1_I0': I1_I0[label]
              }
         )
-    return (informations)
+    return informations, limit
 
+def save_csv(X,intensities):
+    path_to_files = {}
+    for filename, Y in intensities.items():
+        path_to_file = f"{app.config['UPLOAD_FOLDER']}/reports/{filename}.csv"
+        with open(path_to_file, 'w') as f:
+            wr = csv.writer(f)
+            Q=[(X[i], Y[i]) for i in range(len(X))]
+            wr.writerows(Q)
+        #path_to_files['filename']=path_to_file
 
+@app.route('/uploads/<filename>')
+def upload_csv(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], f"reports/{filename}.csv")
 
-@app.route('/report', methods=['GET', 'POST'])
+@app.route('/report', methods=['POST'])
 def get_pdf():
-    filename='abc'
-    informations = ['Вот это да', 'Да ладно?']
-    informations = [
-        {'image': '38fd67d49947f64623019d85f1c7af74.jpg', 'name': 'Obrazec 1', 'X': [1, 2, 3], 'Y': [3, 9, 27]},
-    ]
     info_post = request.values
-    informations = get_information(info_post)
-    #print(info_post)
-    f = pdf_make.MakeReport(filename, informations, PROJECT_ROOT)
+
+    informations, limit = get_information(info_post)
+    filename = '_'.join(q['name'] for q in informations)
+
+    f = pdf_make.MakeReport(filename, informations,limit, PROJECT_ROOT)
     directory, filename = f.return_filename()
     return send_from_directory(PROJECT_ROOT+directory, filename)
 
