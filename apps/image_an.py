@@ -10,7 +10,7 @@ def line_intensity(file):
 	profile_rgb=measure.profile_line(image, [int(horz/2), int(0.1*vert)],[int(horz/2), int(0.9*vert)], linewidth=int(0.8*horz))
 	
 	#profile_intensity=profile_rgb[:,0]*0.2126+profile_rgb[:,1]*0.7152+profile_rgb[:,2]*0.0722
-	profile_intensity=profile_rgb[:,0]+profile_rgb[:,1]+profile_rgb[:,2]
+	profile_intensity = profile_rgb[:,0] + profile_rgb[:,1]+profile_rgb[:,2]
 
 	I=profile_intensity[int(0.55*len(profile_intensity)):].max()
 	I0=profile_intensity[:int(0.45*len(profile_intensity))].max()

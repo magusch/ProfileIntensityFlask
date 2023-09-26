@@ -2,9 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>Profile Intensity // Upload Image</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <style>
     .header {
@@ -22,16 +26,33 @@
         opacity: 0.8;
 
     }
+    body {
+            font-family: "Courier";
+            font-size: 1em;
+            color: #1a346d;
+        }
+
+    .header {
+            text-align: center;
+            font-size: 1.3em;
+            font-family: "Courier";
+            font-weight: bold;
+        }
+    .header h1 {
+        font-size: 1.6em;
+    }
 </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 </head>
 <body>
-
 <nav class="navbar navbar-dark header hide_it">
     <div class="button_header col-sm">
-        <a class="navbar-brand" href="https://ifmo.ru"><img src="../static/image/itmo_logo_transp_rus.png" height="100px" alt="" loading="lazy"></a>
+        <a class="navbar-brand" href="https://ifmo.ru"><img src="{{ url_for('static',filename='image/logo-inverted.png')}}" height="100px" alt="" loading="lazy"></a>
     </div>
-    <h1 class="col-sm">Измерительный прибор<br>«Хемилюминометр»</h1>
+
+    <h1 class="col-sm">Измерительный прибор <br> «Хемилюминометр»</h1>
+
     <div class="button_header col-sm">
         <a class="navbar-brand" href="https://nanostructures.ifmo.ru"><h5><center>Научно-образовательный центр<br>«Физика Наноструктур»</center></h5></a>
     </div>
@@ -40,14 +61,17 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark header ">
     <ul class="navbar-nav col-sm">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Инструкция</a>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('index_forms') }}">Главная</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Научная работа</a>
+        <a class="nav-link" href="{{ url_for('description') }}">Описание</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Программа<span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{{ url_for('instruction') }}">Инструкция</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">О Разработчиках</a>
       </li>
     </ul>
 </nav>

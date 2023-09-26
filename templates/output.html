@@ -48,11 +48,16 @@
             box-shadow: 0 12px 16px 0 rgba(210, 210, 210, 0.24), 0 17px 50px 0 rgba(152, 152, 152, 0.19);
         }
     </style>
+
+    <script>
+        colors = ['rgb(18,203,28)', 'rgb(243,150,10)', 'rgb(3,89,219)', 'rgb(203,18,151)', 'rgb(14,118,231)',
+        'rgb(14,231,170)','rgb(255,229,94)','rgb(236,106,167)']
+    </script>
 </head>
 
-<body>
+<div>
 
-<a href="{{ url_for('index_forms') }}?back"><button class="button_back"><b>Назад</b></button></a>
+<a href="{{ url_for('index_forms') }}?back"><button class="button_back btn-primary btn-lg button_submit"><b>Назад</b></button></a>
 <!--<p>
     Выделите <b id='choose'> область I<sub>0</sub></b>
 </p>
@@ -68,25 +73,31 @@
 
 <p>
 
+<p>
+    <div style="margin-left: 10%;margin-right: 10%;" class="form-group col-6 ">
+    <form method="POST" class='general' action="{{ url_for('get_pdf') }}">
+        <!-- General form -->
+        {{form.hidden_tag()}}
+        <p>
+       <b> {{ form.limit.label }} </b>
+       <p>{{ form.limit(size=20) }}<p>
+    <p> {{ form.X }} {{ form.Y }}
+        <input type="hidden" name="X_values" value="{{X}}"></input>
+        <input type="hidden" name="Y_values" value="{{Y}}"></input>
+        <input type="hidden" name="I1_I0" value="{{I1_I0}}"></input>
+    <input type="hidden" name="filenames" value="{{filenames}}"></input>
+    <button id="submit" name="submit" type="submit" class="btn btn-primary btn-sm button_submit" >Файл отчёта</button></p>
+    </form>
+    </div>
+</p>
+<div style="margin-left: 10%;margin-right: 10%;" class="col-6">
+<h3>Данные в формате csv</h3>
+{% for file in filenames %}
+<p><a href="{{ url_for('upload_csv',filename = file) }}" download>{{ file }}</a></p>
+{% endfor %}
+</div>
 
-<table class="table">
-Результат:
-  <thead>
-    <tr>
-      <th scope="col">Образец</th>
-      <th scope="col">Отношение интенсивности левого канала к правому</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for samplename, answer in I1_I0.items() %}
-        <tr>
-           <td> {{ samplename }} </td>
-           <td> <b>{{ answer }}</b></td>
-        </tr>
-    {% endfor %}
 
-  </tbody>
-</table>
 
 
 </p>
@@ -101,8 +112,8 @@
 
 var frst = 0;
 
-colors = ['rgb(18,203,28)', 'rgb(243,150,10)', 'rgb(202,52,5)', 'rgb(203,18,151)', 'rgb(14,118,231)',
-    'rgb(14,231,170)','rgb(255,229,94)','rgb(236,106,167)']
+var font_size = 24;
+
 
 var opts = {
     // The type of chart we want to create
@@ -139,15 +150,22 @@ var opts = {
                             bottom: 20,
             }
         },
+        legend: {
+            align: "start"
+        },
         scales: {
             xAxes: [{
+
                 display: true,
                 scaleLabel: {
                     display: true,
-                    labelString: 'Положение пикселя'
+                    labelString: 'Положение пикселя',
+                    fontSize: font_size,
                 },
                 ticks: {
-                    maxTicksLimit: 24,
+                    stepSize: 50,
+                    maxTicksLimit: 18,
+                    fontSize: font_size,
                 }
             }],
 
@@ -156,7 +174,11 @@ var opts = {
                 scaleLabel: {
                     display: true,
                     labelString: 'Интенсивность пикселя',
-                    fontSize: 24,
+                    fontSize: font_size,
+                },
+                ticks: {
+                    maxTicksLimit: 24,
+                    fontSize: font_size,
                 }
             }]
         },

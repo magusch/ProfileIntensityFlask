@@ -1,13 +1,14 @@
-import os
+import os,json, csv
 
-from flask import Flask, render_template, request,send_file, url_for,redirect, session
+from flask import Flask, render_template, request,send_file, url_for, redirect, session, send_from_directory
 from flask_dropzone import Dropzone
 from werkzeug.utils import secure_filename
 
 from apps.image_an import line_intensity
 
-from apps.forms import UploadForm
+from apps.forms import UploadForm, DownloadFile
 
+from apps import pdf_make
 
 
 app = Flask(__name__, static_folder="static")
@@ -22,7 +23,6 @@ app.config.update(
     UPLOAD_EXTENSIONS = ['.jpg', 'jpeg', '.png', '.gif'],
     STATIC_FOLDER = 'static/',
     STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, "static")),
-
 )
 
 # UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
@@ -77,30 +77,84 @@ def index_forms():
     return render_template('index_upload.html', forms=forms)
 
 
-
 @app.route('/completed')
 def completed():
     #file = session.get('filename')
     datas = session.get('datas')
     if datas:
+        form = DownloadFile()
         intensities = {}
         pixels = {}
+        filenames = {}
         I1_I0 = {}
         for data in datas:
             samplename = data['samplename']
             file = data['filename']
             Y, I1_I0[samplename] = line_intensity(file)
             intensities[samplename] = list(Y)
-
-            #pixels[samplename] \
+            filenames[samplename] = file.split('/')[-1]
             X = (list(range(len(Y))))
-
+            save_csv(X, intensities)
             #filename = 'static/uploads/' + file.split('/')[-1] #change
             #os.path.join(app.config['UPLOADED_PATH'], secure_filename(file))
-        return render_template('output.html', X=X, Y=intensities, I1_I0=I1_I0)
+        return render_template('output.html', X=X, Y=intensities, I1_I0=I1_I0, form=form, filenames=filenames)
     else:
         return redirect (url_for('index_forms'))
 
+
+@app.route('/description', methods=['GET', 'POST'])
+def description():
+    return render_template('description.html')
+
+
+@app.route('/instruction', methods=['GET', 'POST'])
+def instruction():
+    return render_template('instruction.html')
+
+def get_information(info_post):
+    Y = ((json.loads(info_post['Y_values'].replace("'", "\""))))
+    filenames = ((json.loads(info_post['filenames'].replace("'", "\""))))
+    limit = float(info_post['limit'])
+    X = ((json.loads(info_post['X_values'].replace("'", "\""))))
+    I1_I0 = ((json.loads(info_post['I1_I0'].replace("'", "\""))))
+
+    informations = []
+    for label, intensity in Y.items():
+        # if I1_I0[label]>limit:
+        #     I1_I0_answer = True
+        # else:
+        #     I1_I0_answer = False
+        informations.append(
+            {
+                'image': filenames[label], 'name': label, 'X': X, 'Y': intensity, 'I1_I0': I1_I0[label]
+             }
+        )
+    return informations, limit
+
+def save_csv(X,intensities):
+    path_to_files = {}
+    for filename, Y in intensities.items():
+        path_to_file = f"{app.config['UPLOAD_FOLDER']}/reports/{filename}.csv"
+        with open(path_to_file, 'w') as f:
+            wr = csv.writer(f)
+            Q=[(X[i], Y[i]) for i in range(len(X))]
+            wr.writerows(Q)
+        #path_to_files['filename']=path_to_file
+
+@app.route('/uploads/<filename>')
+def upload_csv(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], f"reports/{filename}.csv")
+
+@app.route('/report', methods=['POST'])
+def get_pdf():
+    info_post = request.values
+
+    informations, limit = get_information(info_post)
+    filename = '_'.join(q['name'] for q in informations)
+
+    f = pdf_make.MakeReport(filename, informations,limit, PROJECT_ROOT)
+    directory, filename = f.return_filename()
+    return send_from_directory(PROJECT_ROOT+directory, filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

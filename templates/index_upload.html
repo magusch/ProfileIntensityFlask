@@ -6,18 +6,7 @@
 
 
     <style type="text/css">
-        body {
-            font-family: "Courier";
-            font-size: 1em;
-            color: #1a346d;
-        }
 
-        .header {
-            text-align: center;
-            font-size: 1.4em;
-            font-family: "Courier";
-            font-weight: bold;
-        }
 
         .form {
             text-align: center;
@@ -46,7 +35,7 @@
             text-align: center;
             padding: 15px 25px;
             height: 70px;
-            width: 20%;
+
             color: #f3f0ed;
         }
 
@@ -77,48 +66,85 @@
 
         }
 
+        .str_field {
+            width: 300px;
+        }
+
     </style>
 
 </head>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
 
 <div style="text-align: center;" class="hide_it">
     <button class="btn btn-outline-primary btn-lg hid_but">Начать</button>
 <p></p>
-        <img width="600px" src="http://isu.ifmo.ru/pls/apex/f?p=2143:0:0:DWNLD_F:NO::FILE:BC2C3499B2FD1C21457CF4C2098E4695">
+        <img class="img-fluid" src="{{ url_for('static',filename='image/Screenshot_1.png')}}">
 </div>
 
 <div class="show_it" style="display: none;">
 <p>
     <form action="" method="post" class="form" enctype="multipart/form-data">
+        <div class="form-group col-6 col-sm-6 offset-3 offset-md-3">
+            <label for="floatingSelect">Выбрать хемилюминофор</label>
+            <select class="form-control" id="floatingSelect" aria-label="Default select example">
+              <option value="lmnl" selected>Люминол</option>
+              <option value="lcgnn">Люцигенин</option>
+            </select>
+        </div>
+
      {% for form in forms %}
         {{ form.hidden_tag() }}
 
-         <div class="hid_obj_{{ loop.index }}" style="display: none;">
-            <label> Название образца: </label>
-                {{ form.samplename(class_='str_field %s'%(loop.index), id='name_%s'%(loop.index), value='Номер %s'%(loop.index)) }}
+         <div class="hid_obj_{{ loop.index }} container" style="display: none;">
+            <div class="col-sm"><label> Название образца {{ loop.index }}: </label>
+                {{ form.samplename(class_='str_field %s btn-lg'%(loop.index), id='name_%s'%(loop.index), value='Номер %s'%(loop.index)) }}</div>
             <label for="upl {{ loop.index }}" class="btn btn-warning btn-lg {{ loop.index }}" id="fake_button{{ loop.index }}">Загрузить Файл</label>{{ form.filename(class_='custom-file-upload', id='upl %s' %(loop.index))}}
             <div class="hid_but_{{ loop.index }}" style="display: none; margin-bottom: 10px;">
              <button type="button" class="btn btn-outline-secondary">Добавить образец</button>
+            </div>
+            <div class="del_but_{{ loop.index }}" style="display: none; margin-bottom: 10px;">
+             <button type="button" class="btn btn-outline-secondary">Удалить образец</button>
             </div>
          </div>
         <script>
             $('#fake_button{{ loop.index }}').click(function(){
                 $('.hid_but_{{ loop.index }}').fadeIn();
+                $('.del_but_{{ loop.index + 1 }}').fadeIn();
                 $( "label.btn.{{ loop.index }}" ).html('Файл {{ loop.index }} добавлен');
-        });
+            });
+
             $('#name_{{ loop.index }}').click(function(){
                 $( "input.str_field.{{ loop.index }}" ).val('');
-        });
+            });
+
             $('.hid_but_{{ loop.index }}').click(function(){
-             $('.hid_obj_{{ loop.index + 1 }}').fadeIn();
-             $('.hid_but_{{ loop.index }}').fadeOut();
-        });
+                var filename = document.getElementById('upl {{ loop.index }}').files[0]['name']
+                if (filename.length>13) {
+                    filename = filename.slice(0, 5) + '...' + filename.slice(-8)
+                }
+                $( "label.btn.{{ loop.index }}" ).html(filename);
+
+                $('.hid_obj_{{ loop.index + 1 }}').fadeIn();
+                $('.del_but_{{ loop.index + 1  }}').fadeIn();
+                $('.del_but_{{ loop.index  }}').fadeOut();
+                $('.hid_but_{{ loop.index }}').fadeOut();
+            });
+
+            var control = $("#upl {{ loop.index }}");
+
+            $('.del_but_{{ loop.index }}').click(function(){
+                control.replaceWith( control.val('').clone( true ) );
+
+                 $('.hid_obj_{{ loop.index  }}').fadeOut();
+                 $('.del_but_{{ loop.index  }}').fadeOut();
+                 $('.del_but_{{ loop.index - 1 }}').fadeIn();
+                 $('.hid_but_{{ loop.index - 1 }}').fadeIn();
+            });
         </script>
 
      {% endfor %}
-        <p><button id="submit" name="submit" type="submit" class="btn btn-primary btn-lg" >Запустить</button></p>
+        <p><button id="submit" name="submit" type="submit" class="btn btn-primary btn-sm button_submit" >Запустить</button></p>
     </form>
 </p>
 
